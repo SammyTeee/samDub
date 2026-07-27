@@ -1,0 +1,14 @@
+node_modules/
+.electron-data/
+.smoke-result.json
+
+# Native build output
+native/build/
+native/out/
+
+# Logs and local OS/editor files
+*.log
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
