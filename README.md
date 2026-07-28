@@ -37,6 +37,7 @@ Release packages are currently unsigned. Windows SmartScreen or macOS Gatekeeper
 ## Site
 
 The minimal product page lives in `site/samDub/` and is published at [sam.taylor.org.uk/samDub/](https://sam.taylor.org.uk/samDub/).
+Versioned Windows x64 and Intel Mac packages, plus their SHA-256 manifests, are published in the [v0.5.0 GitHub release](https://github.com/SammyTeee/samDub/releases/tag/v0.5.0).
 
 ## Performance workflow
 

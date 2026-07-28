@@ -4,13 +4,14 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#080b0a">
-  <meta name="description" content="samDub is a focused Windows performance deck for live dub sets: filter, echo, build, drop, triggers, two-deck playback, and set recording.">
+  <meta name="description" content="samDub is a focused desktop performance deck for live dub sets: filter, echo, build, drop, triggers, two-deck playback, and set recording.">
   <meta property="og:title" content="samDub">
   <meta property="og:description" content="A dub machine, not a DAW.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://sam.taylor.org.uk/samDub/">
   <meta property="og:image" content="https://sam.taylor.org.uk/samDub/samdub-preview.png">
   <title>samDub — live dub performance</title>
+  <link rel="icon" type="image/png" href="icon.png">
   <link rel="preload" as="image" href="samdub-preview.png" fetchpriority="high">
   <style>
     :root {
@@ -110,6 +111,44 @@
     }
     .frame img { width: 100%; height: auto; display: block; }
     figcaption { margin-top: 12px; color: var(--dim); font-size: 8px; }
+    .downloads {
+      scroll-margin-top: 24px;
+      display: grid;
+      grid-template-columns: minmax(240px, .5fr) minmax(0, 1fr);
+      gap: clamp(36px, 6vw, 92px);
+      margin: clamp(76px, 10vw, 150px) 0;
+      align-items: start;
+    }
+    .download-head h2 { margin: 14px 0; font-size: clamp(34px, 4.5vw, 64px); line-height: .96; letter-spacing: -.055em; }
+    .download-head > p:not(.eyebrow, .unsigned) { max-width: 440px; margin: 0; color: var(--muted); font-size: 16px; line-height: 1.6; }
+    .unsigned { max-width: 460px; margin: 24px 0 0; color: #c1a86b; font: 8px/1.65 var(--mono); letter-spacing: .08em; text-transform: uppercase; }
+    .download-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
+    .download-card { min-width: 0; padding: clamp(24px, 3vw, 36px); border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); background: #0d12100d; }
+    .download-card > span, .download-card small { display: block; color: var(--cyan); font: 9px var(--mono); letter-spacing: .1em; }
+    .download-card h3 { margin: 21px 0 8px; font-size: 22px; letter-spacing: -.03em; }
+    .download-card p { min-height: 44px; margin: 0 0 22px; color: var(--muted); font-size: 13px; line-height: 1.5; }
+    .download-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
+    .secondary-download {
+      display: inline-flex;
+      min-height: 44px;
+      align-items: center;
+      padding: 0 16px;
+      border: 1px solid #40564b;
+      color: var(--text);
+      font: 700 10px var(--mono);
+      letter-spacing: .1em;
+      text-decoration: none;
+    }
+    .secondary-download:hover { border-color: var(--cyan); color: var(--cyan); }
+    .release-file, .checksum {
+      display: block;
+      overflow-wrap: anywhere;
+      user-select: all;
+      color: var(--muted);
+      font: 9px/1.55 var(--mono);
+    }
+    .release-file { min-height: 42px; margin-bottom: 18px; color: var(--text); }
+    .download-card small { margin-bottom: 7px; color: var(--dim); font-size: 7px; }
     .features {
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -140,6 +179,7 @@
 
     @media (max-width: 900px) {
       .features { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .downloads { grid-template-columns: 1fr; }
       .spectrum { grid-template-columns: 1fr; }
     }
     @media (max-width: 680px) {
@@ -153,6 +193,7 @@
       .frame { aspect-ratio: 4 / 3; }
       .frame img { width: auto; max-width: none; height: 100%; transform: translateX(-23%); }
       figcaption a { color: var(--lime); }
+      .download-grid { grid-template-columns: 1fr; }
       .features { grid-template-columns: 1fr; }
       .feature { min-height: 150px; }
       footer { align-items: flex-start; flex-direction: column; justify-content: center; }
@@ -165,7 +206,7 @@
 <body>
   <header class="wrap">
     <a class="brand" href="./" aria-label="samDub home"><span class="mark" aria-hidden="true"></span><span>sam<b>Dub</b></span></a>
-    <span class="badge">WINDOWS · v0.4</span>
+    <span class="badge">WINDOWS + INTEL MAC · v0.5</span>
   </header>
 
   <main class="wrap">
@@ -174,8 +215,8 @@
       <h1>A dub machine,<br>not a DAW.</h1>
       <p class="lede">Load a tune. Work the filter and echo. Build pressure, hit Drop, and record the whole set.</p>
       <div class="hero-actions">
-        <a class="cta" href="#deck">VIEW THE DECK ↓</a>
-        <span class="meta">WINDOWS 10/11 · LOCAL FILES STAY LOCAL</span>
+        <a class="cta" href="#download">DOWNLOAD v0.5.0 ↓</a>
+        <span class="meta">WINDOWS X64 + INTEL MAC · LOCAL FILES STAY LOCAL</span>
       </div>
     </section>
 
@@ -185,6 +226,42 @@
       </div>
       <figcaption>The complete 1920 × 1080 performance surface. <a href="samdub-preview.png">View full interface</a></figcaption>
     </figure>
+
+    <section class="downloads" id="download" aria-labelledby="download-title">
+      <div class="download-head">
+        <p class="eyebrow">DOWNLOAD · v0.5.0</p>
+        <h2 id="download-title">Choose your build.</h2>
+        <p>Windows x64 and Intel Mac. Local audio stays local.</p>
+        <p class="unsigned">Unsigned release — Windows SmartScreen or macOS Gatekeeper may ask you to confirm the app. Verify the SHA-256 before opening.</p>
+      </div>
+      <div class="download-grid">
+        <article class="download-card">
+          <span>WINDOWS · X64</span>
+          <h3>Installer</h3>
+          <p>Installs samDub for your account and adds the weed-leaf shortcut to the Start Menu.</p>
+          <div class="download-actions">
+            <a class="cta" href="https://github.com/SammyTeee/samDub/releases/download/v0.5.0/samDub-0.5.0-windows-x64-setup.exe">DOWNLOAD .EXE</a>
+          </div>
+          <code class="release-file">samDub-0.5.0-windows-x64-setup.exe</code>
+          <small>SHA-256</small>
+          <code class="checksum">b335eb7d9064a1b560438b0345592f9795d9d276242ed6871c3d57ab50f8ffe3</code>
+        </article>
+        <article class="download-card">
+          <span>macOS · INTEL</span>
+          <h3>Disk image or ZIP</h3>
+          <p>Intel Mac build. Not Apple silicon native.</p>
+          <div class="download-actions">
+            <a class="cta" href="https://github.com/SammyTeee/samDub/releases/download/v0.5.0/samDub-0.5.0-macos-intel.dmg">DOWNLOAD .DMG</a>
+            <a class="secondary-download" href="https://github.com/SammyTeee/samDub/releases/download/v0.5.0/samDub-0.5.0-macos-intel.zip">DOWNLOAD .ZIP</a>
+          </div>
+          <code class="release-file">samDub-0.5.0-macos-intel.dmg<br>samDub-0.5.0-macos-intel.zip</code>
+          <small>DMG SHA-256</small>
+          <code class="checksum">c5dd3d08452057a9c200cba1006c4c8c06e143e6fa1944f1e6d3341c2b05859b</code>
+          <small>ZIP SHA-256</small>
+          <code class="checksum">3077f784ded8d233bfbd66aada180815f9f3169668970116073ab8bdb44bd684</code>
+        </article>
+      </div>
+    </section>
 
     <section class="features" aria-label="samDub features">
       <article class="feature"><span>01</span><h2>Build / Drop</h2><p>One control raises the pressure. One hit clears it.</p></article>
@@ -206,7 +283,7 @@
   </main>
 
   <footer class="wrap">
-    <b>samDub 0.4</b>
+    <b>samDub 0.5.0</b>
     <span>LOCAL AUDIO · NO CLOUD</span>
   </footer>
 </body>
