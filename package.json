@@ -10,8 +10,8 @@
   "scripts": {
     "setup-electron": "npx --yes node@22.12.0 node_modules/electron/install.js",
     "start": "electron .",
-    "dist:win": "npx --yes node@22.12.0 node_modules/electron-builder/cli.js --win nsis --x64",
-    "dist:mac:intel": "npx --yes node@22.12.0 node_modules/electron-builder/cli.js --mac dmg zip --x64"
+    "dist:win": "npx --yes node@22.12.0 node_modules/electron-builder/cli.js --win nsis --x64 --publish never",
+    "dist:mac:intel": "npx --yes node@22.12.0 node_modules/electron-builder/cli.js --mac dmg zip --x64 --publish never"
   },
   "devDependencies": {
     "electron": "^43.2.0",
