@@ -113,6 +113,7 @@ jobs:
             gh release upload v0.5.0 release/* --clobber --repo "$GITHUB_REPOSITORY"
           else
             gh release create v0.5.0 release/* \
+              --repo "$GITHUB_REPOSITORY" \
               --target "$GITHUB_SHA" \
               --title "samDub 0.5.0" \
               --notes "Windows x64 and Intel macOS packages. This release is unsigned, so Windows SmartScreen or macOS Gatekeeper may ask for confirmation. SHA-256 files are included."
