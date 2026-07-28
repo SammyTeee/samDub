@@ -87,3 +87,33 @@ jobs:
             release/SHA256SUMS-macos-intel.txt
           if-no-files-found: error
           retention-days: 30
+
+  publish-release:
+    name: Publish v0.5.0 release
+    if: github.ref == 'refs/heads/master'
+    needs:
+      - windows-x64
+      - macos-intel
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - name: Download built packages
+        uses: actions/download-artifact@v5
+        with:
+          pattern: samDub-0.5.0-*
+          path: release
+          merge-multiple: true
+
+      - name: Create or update GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view v0.5.0 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload v0.5.0 release/* --clobber --repo "$GITHUB_REPOSITORY"
+          else
+            gh release create v0.5.0 release/* \
+              --target "$GITHUB_SHA" \
+              --title "samDub 0.5.0" \
+              --notes "Windows x64 and Intel macOS packages. This release is unsigned, so Windows SmartScreen or macOS Gatekeeper may ask for confirmation. SHA-256 files are included."
+          fi
