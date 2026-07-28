@@ -1,6 +1,9 @@
 node_modules/
 .electron-data/
 .smoke-result.json
+release/
+site/samDub/downloads/
+site/samdub-site-*.png
 
 # Native build output
 native/build/

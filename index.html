@@ -3,58 +3,349 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dubstation</title>
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self' blob:; connect-src 'none'; object-src 'none'; base-uri 'none'; frame-src 'none'" />
+  <title>samDub</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="app-shell">
     <header class="topbar">
-      <div class="brand"><span class="brand-mark">◉</span><span>DUBSTATION</span><small>01 / PERFORMANCE DECK</small></div>
-      <div class="session"><span class="live-dot"></span> AUDIO ENGINE ONLINE <i></i> MIDI <b id="midi-state">NOT CONNECTED</b></div>
-      <button class="icon-btn" id="settings" title="Controller settings">⚙</button>
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true"><i></i></span>
+        <span class="brand-name"><span>sam</span><b>Dub</b></span>
+        <small>PERFORMANCE DECK</small>
+      </div>
+      <div class="engine-state">
+        <span class="live-dot standby" id="engine-dot"></span>
+        <span id="engine-label">ENGINE STANDBY</span>
+        <i></i>
+        <span>MIDI</span>
+        <b id="midi-state">OFFLINE</b>
+      </div>
+      <div class="top-actions">
+        <span class="shortcut-hint">SPACE · SIREN</span>
+        <button class="record-btn" id="record-set"><span>●</span><b>REC SET</b><small id="record-time">00:00</small></button>
+        <button class="icon-btn" id="settings" aria-label="Open settings" title="Settings">SETTINGS <span>⌁</span></button>
+      </div>
     </header>
 
-    <section class="fx-overview" id="fx-overview">
-      <div class="signal-summary">
-        <span class="signal-lamp"></span>
-        <div><small>LIVE SIGNAL</small><strong id="fx-summary">DRY · FX READY</strong></div>
+    <div class="workspace">
+      <aside class="library-panel" aria-label="Track library">
+        <div class="library-head">
+          <div>
+            <span class="eyebrow">YOUR MUSIC</span>
+            <h2>Library</h2>
+          </div>
+          <span class="library-count" id="library-count">0</span>
+        </div>
+
+        <button class="import-btn" id="load-btn"><span>＋</span> ADD AUDIO</button>
+        <input type="file" id="file-input" accept="audio/*,.flac,.aif,.aiff,.m4a" multiple hidden />
+
+        <label class="search-box">
+          <span aria-hidden="true">⌕</span>
+          <input id="library-search" type="search" placeholder="Search tracks or folders" autocomplete="off" />
+        </label>
+
+        <div class="library-label">READY TO PLAY</div>
+        <button class="library-item builtin active" id="builtin-track" data-track-id="builtin">
+          <span class="track-glyph">◒</span>
+          <span class="library-copy">
+            <b>Midnight Pressure</b>
+            <small>Built-in groove · 86 BPM</small>
+          </span>
+          <span class="track-time">0:08</span>
+        </button>
+
+        <div class="library-label saved-label">ADDED TRACKS</div>
+        <div class="library-list" id="library-list"></div>
+        <div class="library-empty" id="library-empty">
+          <span>↳</span>
+          <p>Tracks you add stay here with their original location.</p>
+        </div>
+
+        <div class="library-foot">
+          <span class="storage-light"></span>
+          <span>LOCAL FILES ONLY</span>
+        </div>
+      </aside>
+
+      <main class="stage">
+        <section class="deck card">
+          <div class="deck-heading">
+            <div class="now-playing">
+              <span class="eyebrow" id="deck-a-state">DECK A · READY</span>
+              <h1 id="track-title">Midnight Pressure</h1>
+              <p id="track-artist">Built-in groove <i>·</i> 86 BPM <i>·</i> loop ready</p>
+            </div>
+            <div class="track-source">
+              <span class="analysis-badge" id="analysis-badge">86 BPM · GRID</span>
+              <span id="source-kind">BUILT IN</span>
+              <button id="reveal-track" hidden>SHOW FILE</button>
+            </div>
+          </div>
+
+          <div class="waveform" id="waveform" aria-label="Track waveform. Click anywhere to seek." title="Click anywhere to seek">
+            <div class="wave-progress" id="wave-progress"></div>
+            <div class="wave-bars" id="wave-bars"></div>
+            <div class="beat-grid" id="beat-grid"></div>
+            <div class="playhead" id="playhead"></div>
+            <span class="wave-empty" id="wave-label">BUILT-IN GROOVE · PRESS PLAY</span>
+          </div>
+
+          <div class="transport-row">
+            <span class="time" id="elapsed">00:00.00</span>
+            <div class="transport">
+              <button class="transport-btn" id="stop" aria-label="Stop" title="Stop">■</button>
+              <button class="play-btn" id="play" aria-label="Play">▶</button>
+              <button class="transport-btn text-btn" id="cue">CUE</button>
+            </div>
+            <span class="time duration" id="duration">00:08.00</span>
+          </div>
+
+          <div class="deck-strip">
+            <label class="strip-control tempo-control">
+              <span>TEMPO</span>
+              <strong id="tempo-val">+0.0%</strong>
+              <input type="range" id="tempo" min="-12" max="12" value="0" step="0.1" />
+            </label>
+            <button class="loop-btn active" id="loop"><span>↻</span> LOOP</button>
+            <div class="level-meter" aria-label="Master output level"><span>L</span><i id="meter-left"></i><span>R</span><i id="meter-right"></i></div>
+            <label class="strip-control master-control">
+              <span>MASTER</span>
+              <input type="range" id="master" min="0" max="1" value="0.82" step="0.01" />
+            </label>
+          </div>
+
+          <div class="deck-b-strip">
+            <div class="deck-b-label"><span>DECK B</span><small id="deck-b-state">NEXT TUNE</small></div>
+            <div class="deck-b-track">
+              <b id="deck-b-title">No track loaded</b>
+              <small id="deck-b-meta">Choose B beside a library track</small>
+            </div>
+            <button class="deck-b-load" id="deck-b-load">＋ LOAD B</button>
+            <span class="deck-b-time" id="deck-b-time">00:00.00</span>
+            <div class="deck-b-transport">
+              <button id="deck-b-cue">CUE</button>
+              <button id="deck-b-play" class="deck-b-play" disabled>▶</button>
+            </div>
+            <button class="deck-b-take" id="deck-b-take" disabled>TAKE B</button>
+            <label class="crossfader">
+              <span>A</span>
+              <input id="crossfader" type="range" min="-100" max="100" value="-100" aria-label="Crossfader between deck A and deck B" disabled />
+              <span>B</span>
+            </label>
+          </div>
+        </section>
+
+        <section class="effects card">
+          <div class="section-heading">
+            <div>
+              <span class="eyebrow">SIGNAL CHAIN</span>
+              <h2>Performance effects</h2>
+            </div>
+            <div class="fx-state">
+              <span class="signal-lamp"></span>
+              <span id="fx-summary">DRY SIGNAL</span>
+              <button class="quiet-btn" id="bypass">BYPASS ALL</button>
+            </div>
+          </div>
+
+          <div class="build-strip">
+            <div class="build-copy">
+              <span class="build-icon">↗</span>
+              <div><b>BUILD</b><small>FILTER DOWN · REVERB UP</small></div>
+            </div>
+            <div class="build-control">
+              <div class="knob build-knob" data-control="build" data-value="0" role="slider" aria-label="Build intensity" aria-valuemin="0" aria-valuemax="100" tabindex="0"><span></span></div>
+              <div class="build-instruction"><strong data-readout="build">READY</strong><small>DRAG UP TO BUILD PRESSURE</small></div>
+            </div>
+            <button class="drop-btn" id="drop-build"><span>↓</span> DROP <small>ENTER</small></button>
+          </div>
+
+          <div class="fx-grid">
+            <article class="fx" data-fx="filter">
+              <div class="fx-title">
+                <span class="fx-number">01</span>
+                <div><b>FILTER</b><small>LOW PASS</small></div>
+                <button class="power on" aria-label="Toggle filter"><span></span></button>
+              </div>
+              <div class="macro-row">
+                <div class="knob big" data-control="filter" data-value="100" role="slider" aria-label="Filter cutoff" aria-valuemin="0" aria-valuemax="100" tabindex="0"><span></span></div>
+                <div class="macro-readout"><strong data-readout="filter">OPEN</strong><small>CUTOFF</small></div>
+              </div>
+              <input class="fx-range" data-control="filter" aria-label="Filter cutoff" type="range" min="0" max="100" value="100" />
+            </article>
+
+            <article class="fx echo-fx" data-fx="delay">
+              <div class="fx-title">
+                <span class="fx-number">02</span>
+                <div><b>ECHO</b><small id="echo-character">DUB · 345 MS</small></div>
+                <button class="power on" aria-label="Toggle echo"><span></span></button>
+              </div>
+              <div class="macro-row">
+                <div class="knob big" data-control="delay" data-value="0" role="slider" aria-label="Echo amount" aria-valuemin="0" aria-valuemax="100" tabindex="0"><span></span></div>
+                <div class="macro-readout"><strong data-readout="delay">0%</strong><small>AMOUNT</small></div>
+              </div>
+              <input class="fx-range" data-control="delay" aria-label="Echo amount" type="range" min="0" max="100" value="0" />
+              <div class="echo-actions">
+                <div class="preset-group" aria-label="Echo character">
+                  <button data-echo-preset="slap">SLAP</button>
+                  <button class="active" data-echo-preset="dub">DUB</button>
+                  <button data-echo-preset="deep">DEEP</button>
+                </div>
+                <button class="throw-btn" id="throw">HOLD THROW</button>
+              </div>
+            </article>
+
+            <article class="fx" data-fx="reverb">
+              <div class="fx-title">
+                <span class="fx-number">03</span>
+                <div><b>SPACE</b><small>SPRING TANK</small></div>
+                <button class="power on" aria-label="Toggle space"><span></span></button>
+              </div>
+              <div class="macro-row">
+                <div class="knob big" data-control="reverb" data-value="0" role="slider" aria-label="Space amount" aria-valuemin="0" aria-valuemax="100" tabindex="0"><span></span></div>
+                <div class="macro-readout"><strong data-readout="reverb">0%</strong><small>AMOUNT</small></div>
+              </div>
+              <input class="fx-range" data-control="reverb" aria-label="Space amount" type="range" min="0" max="100" value="0" />
+            </article>
+
+            <article class="fx" data-fx="crush">
+              <div class="fx-title">
+                <span class="fx-number">04</span>
+                <div><b>GRIT</b><small>TAPE DRIVE</small></div>
+                <button class="power on" aria-label="Toggle grit"><span></span></button>
+              </div>
+              <div class="macro-row">
+                <div class="knob big" data-control="crush" data-value="0" role="slider" aria-label="Grit amount" aria-valuemin="0" aria-valuemax="100" tabindex="0"><span></span></div>
+                <div class="macro-readout"><strong data-readout="crush">0%</strong><small>DRIVE</small></div>
+              </div>
+              <input class="fx-range" data-control="crush" aria-label="Grit amount" type="range" min="0" max="100" value="0" />
+            </article>
+          </div>
+        </section>
+
+        <section class="tools-grid">
+          <article class="siren card">
+            <div class="section-heading compact">
+              <div><span class="eyebrow">DUB SIREN</span><h2>Signal generator</h2></div>
+              <span class="keycap">SPACE</span>
+            </div>
+            <div class="siren-body">
+              <div class="siren-display">
+                <span>FREQUENCY</span>
+                <strong id="siren-hz">385 Hz</strong>
+                <i></i>
+              </div>
+              <div class="siren-controls">
+                <div class="knob-wrap"><div class="knob" data-control="sirenFreq" data-value="42" role="slider" aria-label="Siren pitch" aria-valuemin="0" aria-valuemax="100" tabindex="0"><span></span></div><label>PITCH</label></div>
+                <div class="knob-wrap"><div class="knob" data-control="sirenRate" data-value="18" role="slider" aria-label="Siren wobble" aria-valuemin="0" aria-valuemax="100" tabindex="0"><span></span></div><label>WOBBLE</label></div>
+                <button class="fire" id="siren-fire">HOLD TO FIRE <span>↗</span></button>
+              </div>
+            </div>
+          </article>
+
+          <article class="pads card">
+            <div class="section-heading compact">
+              <div><span class="eyebrow">TRIGGER BANK</span><h2>One-shots</h2></div>
+              <span class="keycap">Q W E R · A S D F</span>
+            </div>
+            <div class="pad-grid">
+              <button class="pad" data-pad="kick"><span>Q</span><b>KICK</b></button>
+              <button class="pad" data-pad="snare"><span>W</span><b>SNARE</b></button>
+              <button class="pad" data-pad="dub"><span>E</span><b>DUB HIT</b></button>
+              <button class="pad" data-pad="vox"><span>R</span><b>VOCAL</b></button>
+              <button class="pad" data-pad="horn"><span>A</span><b>HORN</b></button>
+              <button class="pad" data-pad="riser"><span>S</span><b>RISER</b></button>
+              <button class="pad" data-pad="laser"><span>D</span><b>LASER</b></button>
+              <button class="pad" data-pad="scratch"><span>F</span><b>SCRATCH</b></button>
+            </div>
+          </article>
+        </section>
+
+        <section class="dub-spectrum card" aria-labelledby="spectrum-title">
+          <div class="spectrum-head">
+            <div>
+              <span>MASTER OUTPUT · POST LIMITER</span>
+              <h3 id="spectrum-title">MASTER SPECTRUM</h3>
+            </div>
+            <div class="spectrum-state" id="spectrum-state"><i></i><span>STANDBY</span></div>
+          </div>
+          <div class="spectrum-screen" role="img" aria-label="Full-width, display-synced master spectrum analyzer with logarithmic bars, peak holds, and a weed leaf watermark">
+            <canvas id="dub-spectrum-canvas" aria-hidden="true"></canvas>
+          </div>
+          <div class="spectrum-axis" aria-hidden="true"><span>SUB · 50 Hz</span><span>LOW MID</span><span>MID</span><span>PRESENCE</span><span>AIR · 16 kHz</span></div>
+        </section>
+
+        <footer>
+          <span class="status-dot"></span>
+          <span id="status">Ready. Add a track or play the built-in groove.</span>
+          <button class="undo-btn" id="undo-library" hidden>UNDO REMOVE</button>
+          <span class="version">samDub 0.5</span>
+        </footer>
+      </main>
+    </div>
+  </div>
+
+  <div class="settings-backdrop" id="settings-backdrop"></div>
+  <aside class="settings-panel" id="settings-panel" role="dialog" aria-modal="true" aria-labelledby="settings-title" aria-hidden="true">
+    <div class="settings-head">
+      <div><span class="eyebrow">CONFIGURATION</span><h2 id="settings-title">Settings</h2></div>
+      <button class="close-btn" id="close-settings" aria-label="Close settings">×</button>
+    </div>
+
+    <section class="settings-section">
+      <div class="setting-row">
+        <div><b>Advanced effect controls</b><p>Show time, feedback and tone shaping here.</p></div>
+        <label class="switch"><input type="checkbox" id="advanced-toggle" /><span></span></label>
       </div>
-      <div class="overview-effects">
-        <button class="overview-fx" data-overview-fx="filter"><span></span><b>FILTER</b><small>OPEN</small></button>
-        <button class="overview-fx" data-overview-fx="delay"><span></span><b>ECHO</b><small>0%</small></button>
-        <button class="overview-fx" data-overview-fx="reverb"><span></span><b>SPACE</b><small>0%</small></button>
-        <button class="overview-fx" data-overview-fx="crush"><span></span><b>DRIVE</b><small>0%</small></button>
+      <div class="advanced-controls" id="advanced-controls">
+        <div class="advanced-head"><span>ECHO DETAIL</span><small id="advanced-preset-label">DUB PRESET</small></div>
+        <label class="detail-control"><span>TIME <b data-detail-readout="delayTime">345 ms</b></span><input type="range" data-detail-control="delayTime" min="80" max="900" value="345" step="5" /></label>
+        <label class="detail-control"><span>FEEDBACK <b data-detail-readout="delayFeedback">56%</b></span><input type="range" data-detail-control="delayFeedback" min="0" max="82" value="56" /></label>
+        <label class="detail-control"><span>TONE <b data-detail-readout="delayTone">52%</b></span><input type="range" data-detail-control="delayTone" min="0" max="100" value="52" /></label>
+        <div class="advanced-head second"><span>CHAIN DETAIL</span></div>
+        <label class="detail-control"><span>FILTER RESONANCE <b data-detail-readout="filterResonance">12%</b></span><input type="range" data-detail-control="filterResonance" min="0" max="100" value="12" /></label>
+        <label class="detail-control"><span>SPACE DECAY <b data-detail-readout="reverbDecay">48%</b></span><input type="range" data-detail-control="reverbDecay" min="0" max="100" value="48" /></label>
       </div>
-      <button class="overview-bypass" id="top-bypass">BYPASS ALL FX</button>
     </section>
 
-    <main>
-      <section class="hero-grid">
-        <div class="deck card">
-          <div class="section-head"><div><label>DECK A</label><h1 id="track-title">Midnight Pressure</h1><p id="track-artist">Built-in groove · 86 BPM · press Play</p></div><button class="load-btn" id="load-btn">＋ LOAD AUDIO</button><input type="file" id="file-input" accept="audio/*" hidden /></div>
-          <div class="waveform" id="waveform"><div class="playhead" id="playhead"></div><div class="wave-bars"></div><span class="wave-empty">DROP AUDIO OR PLAY THE BUILT-IN GROOVE</span></div>
-          <div class="transport"><span class="time" id="elapsed">00:00.00</span><button class="transport-btn" id="stop">■</button><button class="play-btn" id="play">▶</button><button class="transport-btn" id="cue">CUE</button><span class="time right" id="duration">00:00.00</span></div>
-          <div class="deck-controls"><div class="tempo"><span>TEMPO</span><strong id="tempo-val">+0.0%</strong><input type="range" id="tempo" min="-12" max="12" value="0" step="0.1" /></div><div class="meter"><span>L</span><i></i><span>R</span><i></i></div><div class="master"><span>MASTER</span><input type="range" id="master" min="0" max="1" value="0.82" step="0.01" /></div></div>
-        </div>
-        <div class="siren card">
-          <div class="section-head"><div><label>DUB SIREN</label><h2>Signal generator</h2></div><span class="hotkey">SPACE</span></div>
-          <div class="siren-display"><span>FREQUENCY</span><strong id="siren-hz">440 Hz</strong><div class="siren-line"></div></div>
-          <div class="siren-controls"><div class="knob-wrap"><div class="knob" data-control="sirenFreq" style="--fill:42%"><span></span></div><label>PITCH</label></div><div class="knob-wrap"><div class="knob" data-control="sirenRate" style="--fill:18%"><span></span></div><label>WOBBLE</label></div><div class="knob-wrap"><div class="knob" data-control="sirenLevel" style="--fill:55%"><span></span></div><label>LEVEL</label></div></div>
-          <div class="siren-actions"><button class="fire" id="siren-fire">HOLD TO FIRE <span>↗</span></button><button class="wave-btn active" data-wave="sawtooth">SAW</button><button class="wave-btn" data-wave="square">SQR</button></div>
-        </div>
-      </section>
+    <section class="settings-section midi-settings">
+      <div class="settings-title-row"><div><span class="eyebrow">CONTROLLER</span><h3>MIDI learn</h3></div><span class="midi-led"></span></div>
+      <p>Arm learn, click a performance control, then move a knob on your controller.</p>
+      <div id="mapping-list" class="mapping-list">
+        <div><span>FILTER CUTOFF</span><code>UNASSIGNED</code></div>
+        <div><span>ECHO AMOUNT</span><code>UNASSIGNED</code></div>
+        <div><span>BUILD MACRO</span><code>UNASSIGNED</code></div>
+        <div><span>TRIGGER BANK</span><code>UNASSIGNED</code></div>
+      </div>
+      <button class="learn-btn" id="learn">ENABLE MIDI LEARN</button>
+    </section>
 
-      <section class="rack card"><div class="section-head rack-head"><div><label>DUB RACK</label><h2>Send effects</h2></div><div class="rack-actions"><button class="small-btn" id="bypass">BYPASS ALL</button><button class="small-btn accent" id="randomise">⤨ RANDOMISE</button></div></div><div class="fx-grid">
-        <article class="fx" data-fx="filter"><div class="fx-title"><span class="fx-icon">◒</span><div><b>FILTER</b><small>LOW PASS</small></div><button class="power on" aria-label="Toggle filter">●</button></div><div class="knob-wrap"><div class="knob big" data-control="filter" data-value="100" tabindex="0" style="--fill:100%"><span></span></div><strong class="readout">OPEN</strong><label>CUTOFF</label></div><input class="fx-range" data-control="filter" type="range" min="0" max="100" value="100" /></article>
-        <article class="fx" data-fx="delay"><div class="fx-title"><span class="fx-icon">↝</span><div><b>ECHO THROW</b><small>3 / 8 · FEEDBACK</small></div><button class="power on" aria-label="Toggle delay">●</button></div><div class="knob-wrap"><div class="knob big" data-control="delay" data-value="0" tabindex="0" style="--fill:0%"><span></span></div><strong class="readout">0%</strong><label>SEND</label></div><input class="fx-range" data-control="delay" type="range" min="0" max="100" value="0" /><button class="throw-btn" id="throw">HOLD TO THROW <span>⌁</span></button></article>
-        <article class="fx" data-fx="reverb"><div class="fx-title"><span class="fx-icon">◌</span><div><b>SPACE</b><small>SPRING</small></div><button class="power on" aria-label="Toggle reverb">●</button></div><div class="knob-wrap"><div class="knob big" data-control="reverb" data-value="0" tabindex="0" style="--fill:0%"><span></span></div><strong class="readout">0%</strong><label>WET</label></div><input class="fx-range" data-control="reverb" type="range" min="0" max="100" value="0" /></article>
-        <article class="fx" data-fx="crush"><div class="fx-title"><span class="fx-icon">≈</span><div><b>CRUSH</b><small>TAPE SATURATION</small></div><button class="power on" aria-label="Toggle crush">●</button></div><div class="knob-wrap"><div class="knob big" data-control="crush" data-value="0" tabindex="0" style="--fill:0%"><span></span></div><strong class="readout">0%</strong><label>DRIVE</label></div><input class="fx-range" data-control="crush" type="range" min="0" max="100" value="0" /></article>
-      </div></section>
+    <section class="settings-section xinput-settings">
+      <div class="settings-title-row">
+        <div><span class="eyebrow">XINPUT / GAMEPAD</span><h3>Performance controller</h3></div>
+        <div class="gamepad-state" id="gamepad-state"><i></i><span>OFFLINE</span></div>
+      </div>
+      <p id="gamepad-name">Connect an Xbox-compatible controller, then press any button.</p>
+      <div class="controller-map">
+        <div><span>RIGHT TRIGGER</span><code>BUILD · RELEASE DROP</code></div>
+        <div><span>LB / RB</span><code>SIREN · ECHO THROW</code></div>
+        <div><span>LEFT / RIGHT STICK ↑↓</span><code>FILTER · ECHO</code></div>
+        <div><span>A B X Y / D-PAD</span><code>TRIGGER BANK 1–8</code></div>
+        <div><span>MENU / VIEW</span><code>PLAY-PAUSE · STOP</code></div>
+      </div>
+    </section>
 
-      <section class="bottom-grid"><div class="pads card"><div class="section-head"><div><label>TRIGGER BANK</label><h2>One-shot sounds</h2></div><span class="hotkey">Q W E R / A S D F</span></div><div class="pad-grid"><button class="pad" data-pad="kick"><span>01</span><b>KICK</b><small>THUMP</small></button><button class="pad" data-pad="snare"><span>02</span><b>SNARE</b><small>RIMSHOT</small></button><button class="pad" data-pad="dub"><span>03</span><b>DUB HIT</b><small>IMPACT</small></button><button class="pad" data-pad="vox"><span>04</span><b>VOCAL</b><small>“PULL UP”</small></button><button class="pad" data-pad="horn"><span>05</span><b>HORN</b><small>STAB</small></button><button class="pad" data-pad="riser"><span>06</span><b>RISER</b><small>UP &amp; AWAY</small></button><button class="pad" data-pad="laser"><span>07</span><b>LASER</b><small>SPACE DUB</small></button><button class="pad" data-pad="scratch"><span>08</span><b>SCRATCH</b><small>TEXTURE</small></button></div></div><aside class="mapping card"><div class="section-head"><div><label>MIDI MAP</label><h2>Learn on the fly</h2></div><span class="midi-led"></span></div><p>Click any control, then move a knob or press a pad on your controller.</p><div id="mapping-list" class="mapping-list"><div><span class="map-dot"></span><b>FILTER CUTOFF</b><code>UNASSIGNED</code></div><div><span class="map-dot"></span><b>DELAY SEND</b><code>UNASSIGNED</code></div><div><span class="map-dot"></span><b>TRIGGER BANK</b><code>UNASSIGNED</code></div></div><button class="learn-btn" id="learn">⌁ ENABLE MIDI LEARN</button></aside></section>
-    </main>
-    <footer><span>NO SIGNAL, NO PROBLEM.</span><span id="status">Ready for selection.</span><span>DUBSTATION 0.1 · WINDOWS</span></footer>
-  </div>
+    <section class="settings-section utility-settings">
+      <div><b>Reset performance effects</b><p>Return the rack to a clean, dry starting point.</p></div>
+      <button class="quiet-btn" id="reset-fx">RESET FX</button>
+    </section>
+
+    <div class="settings-foot">Changes are saved automatically.</div>
+  </aside>
+
   <script src="renderer.js"></script>
 </body>
 </html>

@@ -8,7 +8,7 @@ FetchContent_Declare(juce
   GIT_SHALLOW TRUE)
 FetchContent_MakeAvailable(juce)
 
-juce_add_gui_app(DubstationNative PRODUCT_NAME "Dubstation" COMPANY_NAME "Dubstation")
+juce_add_gui_app(DubstationNative PRODUCT_NAME "samDub" COMPANY_NAME "samDub")
 target_sources(DubstationNative PRIVATE Source/Main.cpp)
 target_compile_features(DubstationNative PRIVATE cxx_std_17)
 target_compile_definitions(DubstationNative PRIVATE JUCE_WEB_BROWSER=0 JUCE_USE_CURL=0)

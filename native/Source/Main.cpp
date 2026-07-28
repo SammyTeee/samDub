@@ -58,7 +58,7 @@ public:
     {
         g.fillAll(juce::Colour::fromRGB(11, 13, 14));
         g.setColour(juce::Colour::fromRGB(196, 243, 74)); g.setFont(juce::Font(26.0f, juce::Font::bold));
-        g.drawText("DUBSTATION", 34, 26, 400, 40, juce::Justification::left);
+        g.drawText("samDub", 34, 26, 400, 40, juce::Justification::left);
         g.setColour(juce::Colours::lightgrey); g.setFont(juce::Font(14.0f));
         g.drawText("NATIVE AUDIO ENGINE  /  ASIO READY", 36, 70, 500, 24, juce::Justification::left);
         drawMeter(g, 36, 140, 1000, 115);
@@ -91,7 +91,7 @@ private:
 class DubstationApp : public juce::JUCEApplication
 {
 public:
-    const juce::String getApplicationName() override { return "Dubstation"; }
+    const juce::String getApplicationName() override { return "samDub"; }
     const juce::String getApplicationVersion() override { return "0.1.0"; }
     void initialise(const juce::String&) override { mainWindow.reset(new Window(getApplicationName())); }
     void shutdown() override { mainWindow.reset(); }

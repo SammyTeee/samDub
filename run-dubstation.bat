@@ -1,7 +1,3 @@
 @echo off
-cd /d "%~dp0"
-if not exist node_modules\electron\dist\electron.exe (
-  echo First run: installing Electron...
-  call npm install
-)
-call npm start
+rem Legacy launcher retained so existing shortcuts keep working after the samDub rename.
+call "%~dp0run-samDub.bat"
